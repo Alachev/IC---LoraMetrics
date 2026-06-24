@@ -1,0 +1,2 @@
+Time stamp;Contador;RSSI_DL;RSSI_UL;Perdas;PSR;Max_DL;Min_DL;Max_UL;Min_UL
+27/05/2026 17:13:23;1;-32.0;-32.0;4.75;5.25;0;0
