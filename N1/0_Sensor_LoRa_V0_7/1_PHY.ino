@@ -4,10 +4,11 @@ void Phy_radio_receive_DL() {
   if(start_flag == 1 && stop_flag == 0){
     unsigned long agora = millis();
     timeout_flag = 0;
-   if (agora - last_packet_time >= timeout_ms) {
+   if (agora - last_packet_time >= (timeout_ms+500)) {
       if (!timeout_flag) {               // evita repetir a flag a cada ciclo
         timeout_flag = true;
         Serial.println("perdeu pacote DL por timeout");
+        Serial.println(agora-last_packet_time);
         App_radio_send_UL();
      }
       last_packet_time = agora;          // reinicia a contagem para o próximo período
@@ -20,7 +21,7 @@ void Phy_radio_receive_DL() {
       for (int i = 0; i < TAMANHO_PACOTE; i++) {
         PacoteDL[i] = LoRa.read();
       }
-
+      
       digitalWrite(LED_VERDE_PIN, HIGH);
       delay(100);
       digitalWrite(LED_VERDE_PIN, LOW);
@@ -39,7 +40,7 @@ void Phy_radio_receive_DL() {
 
 //================ CAMADA FÍSICA UL ========
 void Phy_radio_send_UL() {
-
+  Serial.println("PHY UL");
   //--- Bloco que faz adequação da leitura de RSSI para um byte ---
   if(RSSI_dBm_DL > -10.5)  // Caso a RSSI medida esteja acima do valor superior -10,5 dBm
   {
@@ -79,13 +80,21 @@ void Phy_radio_send_UL() {
     LoRa.write(PacoteUL[i]);          // Envia byte a byte as informações para o RFM95
   }
   LoRa.endPacket();                   // Finaliza o envio do pacote e o RFM95 transmite o pacote para o Gateway
-  Serial.println("Pacote Enviado");
+  Serial.println("Flag de Envio de timeout");
   Serial.println(PacoteUL[11]);
+  Serial.println("Pacote Enviado");
+  Serial.println("========================================");
   // Pisca o LED Vermelho indicando transmissão de pacote UL (se permitido)
-  //if (modo_tx_vermelho == 1) {
+  if (PacoteUL[11] == 0) {
       digitalWrite(LED_VERMELHO_PIN, HIGH);
       delay(100);
       digitalWrite(LED_VERMELHO_PIN, LOW);
+  }
+      if (PacoteUL[11] == 1) {
+      digitalWrite(LED_AMARELO_PIN, HIGH);
+      delay(100);
+      digitalWrite(LED_AMARELO_PIN, LOW);
+      }
     if(stop_flag == true){
       digitalWrite(LED_VERMELHO_PIN, HIGH);
       digitalWrite(LED_VERDE_PIN, HIGH);

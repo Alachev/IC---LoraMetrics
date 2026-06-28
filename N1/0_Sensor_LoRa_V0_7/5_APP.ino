@@ -8,13 +8,14 @@ void App_radio_receive_DL() {
   //else{
    // digitalWrite(LED_AMARELO_PIN, LOW);
   //}
-
+  Serial.println("APP DL");
 //=============== CHAMA DA APLICAÇÃO DE UL 
   App_radio_send_UL();  // Chama a função da camada de Aplicação de UL
 }
 
 //============== COMEÇA A CRIAR O PACOTE DE UL
 void App_radio_send_UL() {
+  Serial.println("APP UL");
   // Neste ponto zeramos o pacote de UL para garantir que ele não está carregando nenhuma informação de comunicação anterior.
   for (int i = 0; i < TAMANHO_PACOTE; i++) {
     PacoteUL[i] = 0;

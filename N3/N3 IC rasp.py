@@ -228,18 +228,19 @@ def gravaLOG_Gerencia():
 
 while True:
    if ser is None:
-       try:
-           # Ajuste a porta aqui (/dev/ttyUSB0 ou COMx)
-           print("Configuração da porta serial (caminho completo)")
-           print("Para Windows: COM3, COM4, etc")
-           print("Para Linux: /dev/ttyUSB0 , /dev/ttyUSB1, etc")
-           porta_serial = input("Digite aqui:")
-           ser = serial.Serial(porta_serial, 115200, timeout=1, parity=serial.PARITY_NONE)
-           numero_de_medidas = int(input("Digite o número de medidas a serem realizadas: "))
-           condicao_start = 1
-           print("Porta Serial Conectada")
-       except:
-           pass # Se der erro, tenta de novo na próxima volta
+    try:
+        print("Configuração da porta serial (caminho completo)")
+        print("Para Windows: COM3, COM4, etc")
+        print("Para Linux: /dev/ttyUSB0 , /dev/ttyUSB1, etc")
+        #porta_serial = input("Digite aqui:").strip()  # remove espaços extras
+        ser = serial.Serial("/dev/ttyACM1", 115200, timeout=1)#, parity=serial.PARITY_NONE)
+        numero_de_medidas = int(input("Digite o número de medidas a serem realizadas: "))
+        condicao_start = 1
+        print("Porta Serial Conectada")
+    except Exception as e:
+        print(f" Erro ao conectar na porta serial: {e}")
+        ser = None          # Garante que permanece None para nova tentativa
+        # condicao_start permanece 0, então o loop continua perguntando
    if (condicao_start == 1):
        
       #Apenas para imprimir um cabeçalho dos testes no terminal
@@ -273,11 +274,11 @@ while True:
 
          medida_atual = medida_atual + 1
          print("### Medida:",medida_atual, "de ",numero_de_medidas)
-
+         t0 = time.time()
          downlink()
-         time.sleep(tempo_entre_medidas)        
+         time.sleep(tempo_entre_medidas-0.24)        
          uplink()
-         
+         print("Tempo entre DL e UL:",time.time()-t0)
          gravaLOG_Pacote()
          calculaPSR()
          gravaLOG_Gerencia()
