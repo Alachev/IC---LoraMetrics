@@ -217,7 +217,7 @@ def gravaLOG_Gerencia():
      
      # 2. Grava no arquivo de LOG definitivo
      log_def = open(arquivo_LOG_gerencia, 'a')
-     print(strftime("%d/%m/%Y %H:%M:%S"), ";", medida_atual, ";", rssi_DL, ";", rssi_UL, ";", snr_DL, ";", snr_UL, ";", perda_geral, ";", round(psr_geral, 2), file=log_def, sep='')
+     print(strftime("%d/%m/%Y %H:%M:%S"), ";", medida_atual, ";", rssi_DL, ";", rssi_UL, ";", snr_DL, ";", snr_UL, ";", round(psr_DL, 2), ";", round(psr_UL, 2), file=log_def, sep='')
      log_def.close()
 
      print("Rssi DL: ", rssi_DL, " | RSSI UL: ", rssi_UL, " | SNR DL: ", snr_DL, " | SNR UL: ", snr_UL, " | PSR DL: ", round(psr_DL, 2), " | PSR UL: ", round(psr_UL, 2), "%")
@@ -234,6 +234,17 @@ while True:
         print("Para Linux: /dev/ttyUSB0 , /dev/ttyUSB1, etc")
         #porta_serial = input("Digite aqui:").strip()  # remove espaços extras
         ser = serial.Serial("/dev/ttyACM1", 115200, timeout=1)#, parity=serial.PARITY_NONE)
+         # --- INÍCIO DA ROTINA DE RESET DO ESP32 ---
+        ser.setDTR(False)
+        ser.setRTS(False)
+        time.sleep(0.1)
+        ser.setDTR(True)
+        ser.setRTS(True)
+        time.sleep(1.5) # Tempo de estabilização de 1,5 segundos
+
+        # Limpa buffers
+        ser.reset_input_buffer()
+        ser.reset_output_buffer()
         numero_de_medidas = int(input("Digite o número de medidas a serem realizadas: "))
         condicao_start = 1
         print("Porta Serial Conectada")
