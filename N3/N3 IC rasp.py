@@ -12,7 +12,7 @@ import os
 import random
 
 #========== Criação de Variáveis =========================
-global rssi_DL, rssi_UL, contador_UL_recebidos, contador_DL, ultimo_pacote_DL, ultimo_pacote_UL, air_quality_indicator 
+global rssi_DL, rssi_UL, contador_UL_recebidos, contador_DL, ultimo_pacote_DL, ultimo_pacote_UL, air_quality_indicator
  # definições de teste: configurações importantes para a bateria de testes extraídas do arquivo de parâmetros
 
 numero_de_medidas = 0
@@ -23,7 +23,7 @@ medida_atual = 0 # Variáveis Auxiliares
  # Camada Física
 tamanho_do_pacote = 14
 rssi_DL = 0
-rssi_UL = 0 
+rssi_UL = 0
 snr_DL = 0
 snr_UL = 0
 
@@ -40,7 +40,7 @@ contador_UL_recebidos = 0
 ultimo_pacote_UL = 0
 
  # Contabilização de PSR
-psr_DL = 0
+psr_DL = float(0)
 psr_UL = 0
 psr_geral = 0 #Utilizada temporariamente, antes de implementar a 'separação' da PSR de Downlink e Uplink
 perdas_DL = 0
@@ -124,50 +124,48 @@ def uplink():
        #Existe ao menos 1 byte esperando na serial?
        if(ser.in_waiting > 0):
            #Realiza a a leitura da serial
-           Pacote_UL_bytes = ser.read(tamanho_do_pacote) 
-           if len(Pacote_UL_bytes) == tamanho_do_pacote: 
+           Pacote_UL_bytes = ser.read(tamanho_do_pacote)
+           if len(Pacote_UL_bytes) == tamanho_do_pacote:
                
                # Cria novamente um pacote vazio para receber os dados
                Pacote_UL = [0] * tamanho_do_pacote
                
                # Copia para o um vetor (lista) com números, pois o que chega da serial são bytes
-               for i in range(tamanho_do_pacote): 
+               for i in range(tamanho_do_pacote):
                    Pacote_UL[i] = Pacote_UL_bytes[i]
            else:
-               Pacote_UL = [] 
+               Pacote_UL = []
        else:
-           Pacote_UL = [] 
+           Pacote_UL = []
            
-   if(len(Pacote_UL)==tamanho_do_pacote): 
+   if(len(Pacote_UL)==tamanho_do_pacote):
       val_rssi_dl = Pacote_UL[0]
       val_rssi_ul = Pacote_UL[3]
-      
+     
       # Imprime Pacote_UL na Serial Para DEBUG
       # ----------------------------------------------------------------------
       print("[Nível 3 - Borda] - Física - Pacote de Uplink")
       # ----------------------------------------------------------------------
       print(*Pacote_UL)
       print("================================================")
-      
+     
       # Conversão de Byte para RSSI (Cálculo Ajustado)
       # Fórmula: dbm = ((rssi_int - 256) / 2.0) - 74.0 (se > 127) ou (rssi_int / 2.0) - 74.0
-      
+     
       # Cálculo para Downlink
       if val_rssi_dl > 127:
           rssi_DL = ((val_rssi_dl - 256) / 2.0) - 74.0
       else:
           rssi_DL = (val_rssi_dl / 2.0) - 74.0
-      
+     
       # Cálculo para Uplink
       if val_rssi_ul > 127:
           rssi_UL = ((val_rssi_ul - 256) / 2.0) - 74.0
       else:
           rssi_UL = (val_rssi_ul / 2.0) - 74.0
       #SNR Downlink
-      snr_DL = int(Pacote_UL[1]*256 + Pacote_UL[2])/100
-
-         #SNR Uplink
-      snr_UL = int(Pacote_UL[4]*256 + Pacote_UL[5])/100
+      snr_DL = round((Pacote_UL[1] / 4) - 30, 2)
+      snr_UL = round((Pacote_UL[4] / 4) - 30, 2)
 
    # Camada MAC
 
@@ -177,14 +175,14 @@ def uplink():
 
    # Camada de Transporte
          contador_UL_recebidos = contador_UL_recebidos + 1
-         ultimo_pacote_UL = int(Pacote_UL[12]*256) + Pacote_UL[13] 
+         ultimo_pacote_UL = int(Pacote_UL[12]*256) + Pacote_UL[13]
          ultimo_pacote_DL = int(Pacote_UL[9]*256) + Pacote_UL[10]
          if(Pacote_UL[11]==1):
-             perdas_DL = perdas_DL + 1   
+             perdas_DL = perdas_DL + 1  
 
    # Camada de Aplicação      
          # Processamento da Luminosidade (LDR)
-         # Reconstrói valor de 10 bits 
+         # Reconstrói valor de 10 bits
          
    else:
       perdas_UL = perdas_UL+1
@@ -195,6 +193,7 @@ def calculaPSR():
     total_esperado_ul = numero_de_medidas   # ou outra variável que conte os UL enviados
     if contador_DL > 0:
         psr_DL = ((contador_DL - perdas_DL) / contador_DL) * 100
+        print(psr_DL)
         #print('contador dl',contador_DL,'perdas DL',perdas_DL)
     if total_esperado_ul > 0:
         psr_UL = ((contador_UL_recebidos) / medida_atual) * 100
@@ -205,10 +204,10 @@ def gravaLOG_Pacote():
    log = open(arquivo_LOG_pacote, 'a')
    print(strftime("%d/%m/%Y %H:%M:%S"),";",Pacote_UL, file=log)
    log.close()
-        
+       
 #========== Armazenamento de Dados para Exibição
 def gravaLOG_Gerencia():
-     global rssi_DL, rssi_UL, snr_DL, snr_UL, perda_geral, psr_DL, psr_UL, medida_atual 
+     global rssi_DL, rssi_UL, snr_DL, snr_UL, perda_geral, psr_DL, psr_UL, medida_atual
 
      # 1. Grava no arquivo temporário (.tmp) para o Nível 6 Rede ler
      gerencia = open(os.path.join(dir_nivel4, 'dados_gerencia.tmp'), 'a')
@@ -246,6 +245,7 @@ while True:
         ser.reset_input_buffer()
         ser.reset_output_buffer()
         numero_de_medidas = int(input("Digite o número de medidas a serem realizadas: "))
+        tempo_entre_medidas = int(input("Digite o número de medidas:"))
         condicao_start = 1
         print("Porta Serial Conectada")
     except Exception as e:
@@ -280,7 +280,7 @@ while True:
          # Limpa temporários
          open(os.path.join(dir_nivel4, 'dados_gerencia.tmp'), 'w').close()
 
-      
+     
       if (medida_atual < numero_de_medidas):
 
          medida_atual = medida_atual + 1
@@ -300,13 +300,14 @@ while True:
          print("################## Testes finalizados ##################")
          condicao_start = 0
          medida_atual = 0
-         #Atualiza arquivo de Parâmetros   
+         #Atualiza arquivo de Parâmetros  
          Parametros = open(arquivo_parametros, 'w')
-         Parametros.write("0\n0\n") 
+         Parametros.write("0\n0\n")
          Parametros.close()
    else:
      medida_atual = 0 # Garante que próximo teste comece do zero
      print("Script pausado") # Comentado para não poluir
      #time.sleep(1)
      break
-       
+
+      

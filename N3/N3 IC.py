@@ -164,10 +164,10 @@ def uplink():
       else:
           rssi_UL = (val_rssi_ul / 2.0) - 74.0
       #SNR Downlink
-      snr_DL = int(Pacote_UL[1]*256 + Pacote_UL[2])/100
+      
+      snr_DL = round((Pacote_UL[1] / 4) - 30, 2)
+      snr_UL = round((Pacote_UL[4] / 4) - 30, 2)
 
-         #SNR Uplink
-      snr_UL = int(Pacote_UL[4]*256 + Pacote_UL[5])/100
 
    # Camada MAC
 
