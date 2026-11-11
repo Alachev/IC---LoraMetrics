@@ -24,11 +24,11 @@
 
 // ============= CAMADA FÍSICA
 // Parâmetros do LoRa
-#define FREQUENCY_IN_HZ       919E6   // LoRa Frequency
+#define FREQUENCY_IN_HZ       915E6   // LoRa Frequency
 #define txPower               17      // TX power in dBm, defaults to 17
-#define spreadingFactor       7       // ranges from 6-12,default 7
-#define signalBandwidth       500E3   // signal bandwidth in Hz
-#define codingRateDenominator 5       // denominator of the coding rate
+#define spreadingFactor       12       // ranges from 6-12,default 7
+#define signalBandwidth       125E3   // signal bandwidth in Hz
+#define codingRateDenominator 8       // denominator of the coding rate
 
 // Pinos de Saída Digitais (Opcional, mas útil para debug no Gateway)
 #define LED_VERMELHO_PIN 15

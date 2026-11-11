@@ -29,9 +29,9 @@ DEFINIR OS PINOS PINOS PARA O NODEMCU
 // Parâmetros do LoRa
 #define FREQUENCY_IN_HZ       919E6    // LoRa Frequency
 #define txPower               17       // TX power in dBm, defaults to 17
-#define spreadingFactor       7        // ranges from 6-12,default 7
-#define signalBandwidth       500E3    // signal bandwidth in Hz
-#define codingRateDenominator 5        // denominator of the coding rate
+#define spreadingFactor       12        // ranges from 6-12,default 7
+#define signalBandwidth       125E3    // signal bandwidth in Hz
+#define codingRateDenominator 8        // denominator of the coding rate
 
 // Váriáveis utilizadas no código
 int RSSI_dBm_DL; // Variável com a potência rádio recebida (RSSI) em dBm

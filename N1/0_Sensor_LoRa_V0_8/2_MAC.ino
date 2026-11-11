@@ -8,10 +8,10 @@ void Mac_radio_receive_DL() {
       Serial.println("timeout");
       Serial.println(timeout_ms);
     } else {
-      timeout_ms = 1000;  // se for zero, mantém o padrão
+      timeout_ms = 8000;  // se for zero, mantém o padrão
     }
 
-  start_flag = true;  
+    
   // =========== CHAMA A CAMADA DE REDE NET DL
   Net_radio_receive_DL();
 }
@@ -19,6 +19,7 @@ void Mac_radio_receive_DL() {
 //================ CAMADA MAC UL ========
 void Mac_radio_send_UL() {
   // Pode passar na MAC o status do sleep
+  start_flag = true;
   Serial.println("MAC UL");
   //============ CHAMA CAMADA FÍSICA UL
   Phy_radio_send_UL();

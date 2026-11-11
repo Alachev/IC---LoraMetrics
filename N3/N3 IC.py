@@ -28,7 +28,7 @@ snr_DL = 0
 snr_UL = 0
 
  # Camada MAC
-tempo_entre_medidas = 1 # original = 1 # alterado para 10 pior caso SF12/vw125k/cr8/pw17
+tempo_entre_medidas = 3 # original = 1 # alterado para 10 pior caso SF12/vw125k/cr8/pw17
  # Camada de Rede
 ID_base = 0
 ID_sensor = 1
@@ -172,7 +172,7 @@ def uplink():
    # Camada MAC
 
    # Camada de Rede
-      if(Pacote_UL[7]== 1 and Pacote_UL[8] ==0):
+      if(Pacote_UL[7]== ID_sensor and Pacote_UL[8] == ID_base):
          print("##### OK - Pacote recebido (Uplink)")
 
    # Camada de Transporte
@@ -180,7 +180,9 @@ def uplink():
          ultimo_pacote_UL = int(Pacote_UL[12]*256) + Pacote_UL[13] 
          ultimo_pacote_DL = int(Pacote_UL[9]*256) + Pacote_UL[10]
          if(Pacote_UL[11]==1):
-             perdas_DL = perdas_DL + 1   
+             perdas_DL = perdas_DL + 1
+             rssi_DL = -130
+             snr_DL = -30   
 
    # Camada de Aplicação      
          # Processamento da Luminosidade (LDR)
@@ -217,7 +219,7 @@ def gravaLOG_Gerencia():
      
      # 2. Grava no arquivo de LOG definitivo
      log_def = open(arquivo_LOG_gerencia, 'a')
-     print(strftime("%d/%m/%Y %H:%M:%S"), ";", medida_atual, ";", rssi_DL, ";", rssi_UL, ";", snr_DL, ";", snr_UL, ";", perda_geral, ";", round(psr_geral, 2), file=log_def, sep='')
+     print(strftime("%d/%m/%Y %H:%M:%S"), ";", medida_atual, ";", rssi_DL, ";", rssi_UL, ";", snr_DL, ";", snr_UL, ";", round(psr_DL,2), ";", round(psr_UL, 2), file=log_def, sep='')
      log_def.close()
 
      print("Rssi DL: ", rssi_DL, " | RSSI UL: ", rssi_UL, " | SNR DL: ", snr_DL, " | SNR UL: ", snr_UL, " | PSR DL: ", round(psr_DL, 2), " | PSR UL: ", round(psr_UL, 2), "%")

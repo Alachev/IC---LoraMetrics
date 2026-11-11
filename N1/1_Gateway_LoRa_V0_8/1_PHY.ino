@@ -77,17 +77,17 @@ void Phy_serial_send_UL() { // Funcao de envio de pacote de UL para o computador
   PacoteUL[4] = (SNR_UL_inteiro/256);
   PacoteUL[5] = (SNR_UL_inteiro%256);*/
    // 1. Trava o valor entre -30 e +30 para evitar que o byte estoure
+  
+  // Usamos uint8_t (byte) para ocupar apenas 1 byte na memória.
+  // Usamos a função round() para garantir que o número float seja 
+  // arredondado corretamente antes de virar inteiro.
+  SNR_UL_inteiro = (uint8_t)round((SNR_UL + 30.0) * 4.0); // Offset de 30.0dB e passo de 0.25dB (* 4.0)
   if (SNR_UL < -30.0){ 
     SNR_UL = -30.0;
     }
   if (SNR_UL > 30.0){
    SNR_UL = 30.0;
   }
-  // Usamos uint8_t (byte) para ocupar apenas 1 byte na memória.
-  // Usamos a função round() para garantir que o número float seja 
-  // arredondado corretamente antes de virar inteiro.
-  SNR_UL_inteiro = (uint8_t)round((SNR_UL + 30.0) * 4.0); // Offset de 30.0dB e passo de 0.25dB (* 4.0)
-
   // --- Armazena informações de gerência no pacote UL ---
   PacoteUL[4] = (byte)SNR_UL_inteiro;
   // Transmissão do pacote pela serial do ESP32 para o script em Python
